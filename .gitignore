@@ -1,0 +1,8 @@
+.env
+__pycache__/
+.DS_Store
+.venv/
+flex_attachments/
+*.json
+!guide.json
+!courses.json

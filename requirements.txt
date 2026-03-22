@@ -1,0 +1,10 @@
+google-genai>=0.5.0
+playwright
+google-api-python-client
+gspread
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+requests
+openpyxl
+python-dotenv

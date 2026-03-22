@@ -5,4 +5,3 @@ __pycache__/
 flex_attachments/
 *.json
 !guide.json
-!courses.json

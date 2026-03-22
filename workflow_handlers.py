@@ -94,17 +94,30 @@ async def internal_fill_date(page, label: str, value: Any):
         date_str = re.sub(r"[^0-9-]", "", str(value))
         print(f"   [진행] '{label}' 처리 중... (값: {date_str})")
         # 1. 달력 버튼 클릭
-        calendar_btn_sel = f"//div[contains(., '{label}')]//button[contains(., '날짜')]"
+        trigger_selectors = [
+            f"xpath=//div[text()='{label}' or .//span[text()='{label}']]/following-sibling::div//button[contains(., '날짜') or contains(., '선택')]",
+            f"//div[contains(., '{label}')]//button[contains(., '날짜') or contains(., '선택')]",
+            f"div:has-text('{label}') >> button:has-text('선택')",
+            f"div:has-text('{label}') >> button:has-text('날짜')",
+            f"text='{label}' >> xpath=following::button[1]",
+            f"button:near(:text('{label}'))"
+        ]
         
         found = False
         for i in range(4):
-            calendar_btn = page.locator(f"xpath=//div[text()='{label}' or .//span[text()='{label}']]/following-sibling::div//button[contains(., '날짜')]").first
-            if not await calendar_btn.is_visible(timeout=500):
-                calendar_btn = page.locator(calendar_btn_sel).first
+            clicked_btn = False
+            for ts in trigger_selectors:
+                try:
+                    btn = page.locator(ts).first
+                    if await btn.is_visible(timeout=500):
+                        await btn.scroll_into_view_if_needed()
+                        await btn.click()
+                        clicked_btn = True
+                        break
+                except:
+                    continue
 
-            if await calendar_btn.is_visible(timeout=1000):
-                await calendar_btn.scroll_into_view_if_needed()
-                await calendar_btn.click()
+            if clicked_btn:
                 await asyncio.sleep(0.5)
                 date_input = page.locator('input[placeholder*="날짜 입력"]').first
                 if await date_input.is_visible(timeout=3000):

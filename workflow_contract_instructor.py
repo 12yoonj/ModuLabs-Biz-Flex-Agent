@@ -42,7 +42,7 @@ async def handle_contract_instructor(page: Page, plan: Dict[str, Any], template_
                         await asyncio.sleep(0.3)
                         
                         # 텍스트 삭제
-                        is_mac = "darwin" in os.uname().sysname.lower()
+                        is_mac = os.name == 'posix'
                         cmd_key = "Meta" if is_mac else "Control"
                         await page.keyboard.press(f"{cmd_key}+a")
                         await page.keyboard.press("Backspace")
@@ -115,7 +115,7 @@ async def handle_contract_instructor(page: Page, plan: Dict[str, Any], template_
                 content_input = page.locator(cs).first
                 if await content_input.is_visible(timeout=3000):
                     await content_input.click()
-                    is_mac = "darwin" in os.uname().sysname.lower()
+                    is_mac = os.name == 'posix'
                     await page.keyboard.press(f"{('Meta' if is_mac else 'Control')}+a")
                     await page.keyboard.press("Backspace")
                     await content_input.evaluate(f"(el) => {{ el.innerHTML = `{final_content}`; }}")

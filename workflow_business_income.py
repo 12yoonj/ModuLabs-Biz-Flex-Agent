@@ -382,7 +382,7 @@ async def handle_business_income(page, plan: dict, template_name: str, config: d
             content_input = page.locator(cs).first
             if await content_input.is_visible(timeout=3000):
                 await content_input.click()
-                await page.keyboard.press("Meta+a" if "mac" in os.uname().sysname.lower() else "Control+a")
+                await page.keyboard.press("Meta+a" if os.name == 'posix' else "Control+a")
                 await page.keyboard.press("Backspace")
                 if await content_input.evaluate("el => el.isContentEditable"):
                     await content_input.evaluate(f"(el) => {{ el.innerHTML = `{final_content}`; }}")
@@ -393,7 +393,7 @@ async def handle_business_income(page, plan: dict, template_name: str, config: d
         except: continue
 
     # 5. 파일 처리 (XLSX 추출 및 업로드)
-    download_dir = "/Users/yoonjijeong/에이전트/flex_attachments"
+    download_dir = os.path.join(os.getcwd(), "flex_attachments")
     if not os.path.exists(download_dir): os.makedirs(download_dir)
     downloaded_paths = []
 

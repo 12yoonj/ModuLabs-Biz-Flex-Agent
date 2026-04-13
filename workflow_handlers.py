@@ -681,7 +681,7 @@ async def handle_pumiseo(page, plan, template_name, config):
                 if await content_input.is_visible(timeout=3000):
                     await content_input.click()
                     # 전체 선택 후 삭제
-                    await page.keyboard.press("Meta+a" if "mac" in os.uname().sysname.lower() else "Control+a")
+                    await page.keyboard.press("Meta+a" if os.name == 'posix' else "Control+a")
                     await page.keyboard.press("Backspace")
                     await asyncio.sleep(0.5)
                     

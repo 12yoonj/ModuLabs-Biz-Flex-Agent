@@ -31,7 +31,7 @@ async def handle_education_services(page: Page, plan: Dict[str, Any], template_n
                     if await title_locator.is_visible(timeout=2000):
                         await title_locator.click()
                         await asyncio.sleep(0.3)
-                        is_mac = "darwin" in os.uname().sysname.lower()
+                        is_mac = os.name == 'posix'
                         cmd_key = "Meta" if is_mac else "Control"
                         await page.keyboard.press(f"{cmd_key}+a")
                         await page.keyboard.press("Backspace")
@@ -98,7 +98,7 @@ async def handle_education_services(page: Page, plan: Dict[str, Any], template_n
                 content_input = page.locator(cs).first
                 if await content_input.is_visible(timeout=3000):
                     await content_input.click()
-                    is_mac = "darwin" in os.uname().sysname.lower()
+                    is_mac = os.name == 'posix'
                     await page.keyboard.press(f"{('Meta' if is_mac else 'Control')}+a")
                     await page.keyboard.press("Backspace")
                     await content_input.evaluate(f"(el) => {{ el.innerHTML = `{final_content}`; }}")

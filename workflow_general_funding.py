@@ -102,7 +102,7 @@ async def handle_general_funding(page, plan: dict, template_name: str, config: d
                     await locator.click()
                     await asyncio.sleep(0.5)
                     # 전체 선택 후 입력
-                    await page.keyboard.press("Meta+a" if "mac" in os.uname().sysname.lower() else "Control+a")
+                    await page.keyboard.press("Meta+a" if os.name == 'posix' else "Control+a")
                     await page.keyboard.press("Backspace")
                     await locator.fill(title_value)
                     await page.keyboard.press("Enter")
@@ -119,7 +119,7 @@ async def handle_general_funding(page, plan: dict, template_name: str, config: d
                 if await header_title.is_visible(timeout=1000):
                     await header_title.click()
                     await asyncio.sleep(0.5)
-                    await page.keyboard.press("Meta+a" if "mac" in os.uname().sysname.lower() else "Control+a")
+                    await page.keyboard.press("Meta+a" if os.name == 'posix' else "Control+a")
                     await page.keyboard.press("Backspace")
                     await page.keyboard.type(title_value)
                     await page.keyboard.press("Enter")
@@ -358,7 +358,7 @@ async def handle_general_funding(page, plan: dict, template_name: str, config: d
             content_input = page.locator(cs).first
             if await content_input.is_visible(timeout=3000):
                 await content_input.click()
-                await page.keyboard.press("Meta+a" if "mac" in os.uname().sysname.lower() else "Control+a")
+                await page.keyboard.press("Meta+a" if os.name == 'posix' else "Control+a")
                 await page.keyboard.press("Backspace")
                 if await content_input.evaluate("el => el.isContentEditable"):
                     await content_input.evaluate(f"(el) => {{ el.innerHTML = `{final_content}`; }}")
@@ -369,7 +369,7 @@ async def handle_general_funding(page, plan: dict, template_name: str, config: d
         except: continue
 
     # 5. 파일 처리 (XLSX 추출 및 업로드)
-    download_dir = "/Users/yoonjijeong/에이전트/flex_attachments"
+    download_dir = os.path.join(os.getcwd(), "flex_attachments")
     if not os.path.exists(download_dir): os.makedirs(download_dir)
     downloaded_paths = []
 

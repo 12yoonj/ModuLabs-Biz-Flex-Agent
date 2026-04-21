@@ -103,6 +103,12 @@ async def internal_fill_date(page, label: str, value: Any):
             f"button:near(:text('{label}'))"
         ]
         
+        # 0. 기존에 열려있을 수도 있는 다른 달력/팝업 닫기 시도
+        try:
+            await page.mouse.click(10, 10) # 화면 구석 클릭으로 팝업 닫기 유도
+            await asyncio.sleep(0.3)
+        except: pass
+
         found = False
         for i in range(4):
             clicked_btn = False
@@ -118,22 +124,27 @@ async def internal_fill_date(page, label: str, value: Any):
                     continue
 
             if clicked_btn:
-                await asyncio.sleep(0.5)
+                await asyncio.sleep(0.8) # 팝업 애니메이션 대기 시간 증가
                 date_input = page.locator('input[placeholder*="날짜 입력"]').first
                 if await date_input.is_visible(timeout=3000):
+                    await date_input.click()
+                    await asyncio.sleep(0.2)
                     await date_input.fill(date_str)
-                    await page.keyboard.press("Enter")
                     await asyncio.sleep(0.3)
+                    await page.keyboard.press("Enter")
+                    await asyncio.sleep(0.5)
                     
-                    # 팝업 닫기
+                    # 팝업 닫기 (라벨 클릭)
                     exit_selectors = [f'span:text-is("{label}")', f'div:text-is("{label}")', f'text="{label}"']
                     for es in exit_selectors:
                         try:
                             loc = page.locator(es).first
                             if await loc.is_visible(timeout=1000):
                                 await loc.click(force=True)
+                                await asyncio.sleep(0.3)
                                 break
                         except: pass
+                    
                     found = True
                     break
             if i < 3: await scroll_page(page, 300)

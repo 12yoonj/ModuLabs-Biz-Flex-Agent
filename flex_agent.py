@@ -186,14 +186,30 @@ def fetch_filtered_sheet_data_tool(sheet_url: str, sheet_name: str):
         if len(all_values) < 2:
             return "Error: 데이터가 충분하지 않습니다 (1행만 있거나 비어 있음)."
 
-        # 1행은 헤더로 간주 (필요 시 포함), 2행부터 필터링
+        # 1행은 헤더로 간주
         header = all_values[0]
-        filtered_rows = [header] # 헤더 포함
+        filtered_rows = [header]
         
+        # 병합된 셀(빈 셀) 처리를 위한 fill-down 로직 적용
+        last_row_data = [""] * len(header)
         for row_raw in all_values[1:]:
-            row: Any = row_raw
-            if row and len(row) > 0 and row[0].strip(): # type: ignore # A열 데이터가 있는 경우
+            row = list(row_raw)
+            # 행이 완전히 비어있는지 확인
+            if not any(str(cell).strip() for cell in row):
+                continue
+                
+            # A열 또는 B열 중 하나라도 데이터가 있으면 유효한 데이터 행으로 간주
+            # (강사 계약 시트 등에서 A열이 순번, B열이 상태 등일 수 있음)
+            has_id = (len(row) > 0 and str(row[0]).strip()) or (len(row) > 1 and str(row[1]).strip())
+            
+            if has_id:
+                # 빈 셀에 대해 상위 행의 데이터로 채우기 (fill-down)
+                for i in range(len(row)):
+                    if not str(row[i]).strip() and i < len(last_row_data):
+                        row[i] = last_row_data[i]
+                
                 filtered_rows.append(row)
+                last_row_data = row
                 
         return json.dumps(filtered_rows, ensure_ascii=False)
     except Exception as e:
@@ -683,6 +699,10 @@ async def run_planning_flow(config: dict, template_name: str, guide_content: str
     - **계약서 파일(첨부파일)**: 개요!B22 셀에 URL 링크가 있다면 반드시 `attachments` 리스트에 해당 URL을 포함시키세요. 만약 셀이 비어 있거나 올바른 링크 형태가 아니라면 생략하세요.
 12. **강사 용역(Instructor Services) 날짜 규칙**:
     - '[계약서 등 검토 · 승인] 강사 용역' 양식의 경우, **'시작일'은 반드시 '체결(예정)일'과 동일하게 설정**하세요. 시트에 별도의 강의 시작일이 있더라도 무시하고 '체결(예정)일' 값을 '시작일'에 할당해야 합니다.
+13. **데이터 누락 방지 (매우 중요)**:
+    - 구글 시트 데이터에서 헤더 바로 아래의 **첫 번째 데이터 행부터 마지막 데이터 행까지 하나도 빠짐없이** 개별 JSON 객체로 생성하세요. 
+    - 가끔 특정 행이 누락되는 경우가 보고되었습니다. 시트의 모든 유효한 데이터 행(강사 별 건수)을 철저히 확인하여 목록을 만드세요.
+    - 특히 '종료일' 등 날짜 데이터가 모든 행에 정확히 포함되었는지 확인하세요. (시스템이 빈 셀을 자동으로 채워주지만, JSON 생성 시 한 번 더 검증하세요.)
 
 # Output Rules
 1. 사용자에게 먼저 친절한 '업무 계획'을 한국어로 설명하세요.

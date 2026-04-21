@@ -403,13 +403,13 @@ async def export_sheet_to_xlsx(sheet_url, sheet_name, download_dir, config, cust
 
     try:
         from googleapiclient.http import MediaIoBaseDownload  # type: ignore
+        import requests
 
         scopes = [
             'https://www.googleapis.com/auth/spreadsheets.readonly',
             'https://www.googleapis.com/auth/drive.readonly'
         ]
         creds = Credentials.from_service_account_file(sa_path, scopes=scopes)
-        service = build('drive', 'v3', credentials=creds)
 
         # 1. 원본 시트 ID 추출
         match = re.search(r"/spreadsheets/d/([a-zA-Z0-9-_]+)", sheet_url)
@@ -422,23 +422,56 @@ async def export_sheet_to_xlsx(sheet_url, sheet_name, download_dir, config, cust
         filename = custom_filename if custom_filename else f"자금집행요청서_{now_str}.xlsx"
         target_path = os.path.join(download_dir, filename)
 
-        # 3. export_media를 사용한 다운로드 (더 안정적임)
-        print(f"   📥 Excel API 수출 시도 중: {filename}")
-        request = service.files().export_media(
-            fileId=ss_id,
-            mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        )
-        
-        fh = io.BytesIO()
-        downloader = MediaIoBaseDownload(fh, request)
-        done = False
-        while done is False:
-            status, done = downloader.next_chunk()
-        
-        with open(target_path, 'wb') as f:
-            f.write(fh.getvalue())
+        # 3. 특정 시트(탭)의 gid 추출
+        sheets_service = build('sheets', 'v4', credentials=creds)
+        spreadsheet_info = sheets_service.spreadsheets().get(spreadsheetId=ss_id).execute()
+        target_gid = None
+        for s in spreadsheet_info.get('sheets', []):
+            if s.get('properties', {}).get('title') == sheet_name:
+                target_gid = s.get('properties', {}).get('sheetId')
+                break
+                
+        if target_gid is None:
+            print(f"   ❌ 시트 이름 '{sheet_name}'을 찾을 수 없어 전체 시트 다운로드로 대체합니다.")
+            service = build('drive', 'v3', credentials=creds)
+            request = service.files().export_media(
+                fileId=ss_id,
+                mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+            fh = io.BytesIO()
+            downloader = MediaIoBaseDownload(fh, request)
+            done = False
+            while done is False:
+                status, done = downloader.next_chunk()
+            with open(target_path, 'wb') as f:
+                f.write(fh.getvalue())
+        else:
+            print(f"   📥 특정 탭 '{sheet_name}' (gid={target_gid}) Excel 다운로드 시도 중: {filename}")
+            from google.auth.transport.requests import Request as GoogleAuthRequest
+            creds.refresh(GoogleAuthRequest())
+            headers = {'Authorization': f'Bearer {creds.token}'}
+            export_url = f"https://docs.google.com/spreadsheets/d/{ss_id}/export?format=xlsx&gid={target_gid}"
             
-        print(f"   ✅ Excel API 수출 완료: {filename}")
+            response = requests.get(export_url, headers=headers)
+            if response.status_code == 200:
+                with open(target_path, 'wb') as f:
+                    f.write(response.content)
+            else:
+                print(f"   ❌ 특정 탭 엑셀 다운로드 실패 (상태 코드 {response.status_code}). 전체 시트 다운로드로 재시도합니다.")
+                service = build('drive', 'v3', credentials=creds)
+                request = service.files().export_media(
+                    fileId=ss_id,
+                    mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                )
+                fh = io.BytesIO()
+                downloader = MediaIoBaseDownload(fh, request)
+                done = False
+                while done is False:
+                    status, done = downloader.next_chunk()
+                with open(target_path, 'wb') as f:
+                    f.write(fh.getvalue())
+
+        print(f"   ✅ Excel 수출 완료: {filename}")
         return target_path
 
     except Exception as e:

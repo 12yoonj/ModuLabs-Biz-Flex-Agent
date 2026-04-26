@@ -187,19 +187,20 @@ def fetch_filtered_sheet_data_tool(sheet_url: str, sheet_name: str):
             return "Error: 데이터가 충분하지 않습니다 (1행만 있거나 비어 있음)."
 
         # 1행은 헤더로 간주
-        header = all_values[0]
+        header = list(all_values[0]) + ["_original_row_index"]
         filtered_rows = [header]
         
         # 병합된 셀(빈 셀) 처리를 위한 fill-down 로직 적용
-        last_row_data = [""] * len(header)
-        for row_raw in all_values[1:]:
+        last_row_data = [""] * len(all_values[0])
+        
+        # 2행부터 시작 (index 1 = row 2)
+        for idx, row_raw in enumerate(all_values[1:], start=2):
             row = list(row_raw)
             # 행이 완전히 비어있는지 확인
             if not any(str(cell).strip() for cell in row):
                 continue
                 
             # A열 또는 B열 중 하나라도 데이터가 있으면 유효한 데이터 행으로 간주
-            # (강사 계약 시트 등에서 A열이 순번, B열이 상태 등일 수 있음)
             has_id = (len(row) > 0 and str(row[0]).strip()) or (len(row) > 1 and str(row[1]).strip())
             
             if has_id:
@@ -208,7 +209,8 @@ def fetch_filtered_sheet_data_tool(sheet_url: str, sheet_name: str):
                     if not str(row[i]).strip() and i < len(last_row_data):
                         row[i] = last_row_data[i]
                 
-                filtered_rows.append(row)
+                # _original_row_index 추가
+                filtered_rows.append(row + [str(idx)])
                 last_row_data = row
                 
         return json.dumps(filtered_rows, ensure_ascii=False)
@@ -708,7 +710,7 @@ async def run_planning_flow(config: dict, template_name: str, guide_content: str
 1. 사용자에게 먼저 친절한 '업무 계획'을 한국어로 설명하세요.
 2. 설명 끝에 반드시 자동화를 위한 구조화된 JSON 데이터 **배열**을 ```json ... ``` 블록 안에 포함하세요.
 3. 대상 건(기안해야 할 문서)이 여러 개일 경우, 각각을 개별 JSON 객체로 만들고 이들을 묶어 단일 JSON **배열(List)** 형태로 반환해야 합니다. 대상 건이 1개라도 반드시 배열(`[...]`) 형태로 반환하세요.
-4. **상태값 업데이트 식별자 제공 (중요)**: "[계약서 등 검토 · 승인] 강사 용역" 양식을 처리할 때만, 기안이 다 끝나고 난 후 해당 건의 구글 시트 상태값(`[희망]` 등)을 시스템이 `완료`로 자동 변경할 수 있도록 `sheet_update_info`를 추가하세요. "교육 용역" 등 그 외 양식에서는 `sheet_update_info`를 생략하세요. 이 정보 안에는 상태값이 위치한 엑셀 기반 행(row) 순서 번호와 열(col) 순서 번호 정보를 넣어야 합니다.
+4. **상태값 업데이트 식별자 제공 (중요)**: "[계약서 등 검토 · 승인] 강사 용역" 양식을 처리할 때만, 기안이 다 끝나고 난 후 해당 건의 구글 시트 상태값(`[희망]` 등)을 시스템이 `완료`로 자동 변경할 수 있도록 `sheet_update_info`를 추가하세요. "교육 용역" 등 그 외 양식에서는 `sheet_update_info`를 생략하세요. 이 정보 안에는 상태값이 위치한 엑셀 기반 행(row) 순서 번호와 열(col) 순서 번호 정보를 넣어야 합니다. (팁: `fetch_filtered_sheet_data_tool`의 결과물 각 행의 마지막 열에 `_original_row_index`가 추가되어 있으니, 이를 `row_index` 값으로 그대로 사용하세요!)
 5. 각 JSON 객체의 형식 (필수 필드 - 양식에 따라 필드명은 달라질 수 있지만 아래 구조는 유지하세요):
     [
         {{

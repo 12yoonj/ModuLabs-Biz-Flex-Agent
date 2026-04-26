@@ -105,8 +105,8 @@ async def internal_fill_date(page, label: str, value: Any):
         
         # 0. 기존에 열려있을 수도 있는 다른 달력/팝업 닫기 시도
         try:
-            await page.mouse.click(10, 10) # 화면 구석 클릭으로 팝업 닫기 유도
-            await asyncio.sleep(0.3)
+            # await page.mouse.click(10, 10) # 화면 구석 클릭 제거 (모달 닫힘 방지)
+            pass
         except: pass
 
         found = False
@@ -230,11 +230,13 @@ async def select_list_field(page, label: str, target_val: str):
 
         if option_found:
             await asyncio.sleep(0.5)
+            # 드롭다운이 자동으로 닫히지 않을 경우를 대비해 라벨을 클릭하여 안전하게 닫기 유도
             try: await label_loc.click(force=True)
-            except: await page.mouse.click(100, 100)
+            except: pass
         else:
             print(f"   ⚠️ '{label}'에서 '{target_val}' 옵션을 찾지 못했습니다.")
-            await page.keyboard.press("Escape")
+            try: await label_loc.click(force=True)
+            except: pass
     except Exception as e:
         print(f"   ⚠️ '{label}' 선택 중 오류: {e}")
 

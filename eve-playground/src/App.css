@@ -1,0 +1,345 @@
+.app-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--color-space-black);
+}
+
+.sidebar {
+  width: 200px;
+  background-color: var(--color-deep-navy);
+  border-right: 1px solid var(--color-space-gray);
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  gap: 32px;
+}
+
+.chat-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.memory-viewer {
+  width: 196px;
+  background-color: var(--color-deep-navy);
+  border-left: 1px solid var(--color-space-gray);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 12px;
+}
+
+/* Sidebar Components */
+.eve-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.eve-orb {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: var(--color-space-black);
+  border: 2px solid var(--color-arctic-blue);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  box-shadow: 0 0 15px rgba(74, 179, 244, 0.2);
+}
+
+.eve-eye {
+  width: 24px;
+  height: 8px;
+  background-color: var(--color-arctic-blue);
+  border-radius: 4px;
+  box-shadow: 0 0 8px var(--color-arctic-blue);
+}
+
+.eve-name {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-arctic-blue);
+  letter-spacing: 2px;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.status-badge.working {
+  background-color: rgba(61, 232, 160, 0.1);
+  border: 1px solid var(--color-eve-green);
+  color: var(--color-eve-green);
+}
+
+.status-badge.off {
+  background-color: rgba(122, 179, 212, 0.1);
+  border: 1px solid var(--color-dim-blue);
+  color: var(--color-dim-blue);
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.working .status-dot {
+  background-color: var(--color-eve-green);
+  box-shadow: 0 0 6px var(--color-eve-green);
+  animation: pulse 1.8s infinite;
+}
+
+.off .status-dot {
+  background-color: var(--color-dim-blue);
+}
+
+@keyframes pulse {
+  0% { opacity: 0.4; }
+  50% { opacity: 1; }
+  100% { opacity: 0.4; }
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn {
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--color-space-gray);
+  color: var(--color-ice-blue);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  background-color: rgba(42, 74, 122, 0.1);
+}
+
+.btn:hover {
+  background-color: var(--color-dark-blue);
+  border-color: var(--color-arctic-blue);
+  color: var(--color-arctic-blue);
+}
+
+/* Chat Panel Components */
+.chat-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--color-space-gray);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--color-arctic-blue);
+}
+
+.chat-time {
+  font-family: var(--font-display);
+  font-size: 10px;
+  color: var(--color-dim-blue);
+}
+
+.message-stream {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.message {
+  max-width: 80%;
+  padding: 12px 16px;
+  line-height: 1.5;
+}
+
+.message.eve {
+  align-self: flex-start;
+  background-color: var(--color-dark-blue);
+  border: 1px solid var(--color-arctic-blue);
+  color: var(--color-ice-blue);
+  border-radius: 0 12px 12px 12px;
+}
+
+.message.user {
+  align-self: flex-end;
+  background-color: var(--color-dark-green);
+  border: 1px solid var(--color-eve-green);
+  color: var(--color-eve-green);
+  border-radius: 12px 0 12px 12px;
+}
+
+.input-area {
+  padding: 20px 24px;
+  border-top: 1px solid var(--color-space-gray);
+  display: flex;
+  gap: 12px;
+}
+
+.chat-input {
+  flex: 1;
+  background-color: rgba(42, 74, 122, 0.1);
+  border: 1px solid var(--color-space-gray);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: var(--color-ice-blue);
+  font-family: var(--font-body);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.chat-input:focus {
+  border-color: var(--color-arctic-blue);
+}
+
+.send-btn {
+  background-color: rgba(74, 179, 244, 0.1);
+  border: 1px solid var(--color-arctic-blue);
+  color: var(--color-arctic-blue);
+  padding: 0 20px;
+  border-radius: 8px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+
+.send-btn:hover {
+  background-color: var(--color-arctic-blue);
+  color: var(--color-space-black);
+}
+
+/* Tool Card */
+.tool-card {
+  margin-top: 12px;
+  background-color: var(--color-deep-navy);
+  border: 1px solid var(--color-space-gray);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.tool-header {
+  font-family: var(--font-display);
+  font-size: 11px;
+  color: var(--color-dim-blue);
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.tool-status.success {
+  color: var(--color-eve-green);
+}
+
+.tool-body {
+  font-size: 12px;
+  color: var(--color-ice-blue);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tool-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Memory Viewer Components */
+.memory-header {
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--color-arctic-blue);
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.memory-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+}
+
+.memory-card {
+  background-color: rgba(42, 74, 122, 0.1);
+  border: 1px solid var(--color-space-gray);
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.memory-card:hover {
+  border-color: var(--color-dim-blue);
+  background-color: rgba(42, 74, 122, 0.2);
+}
+
+.memory-title {
+  font-size: 12px;
+  color: var(--color-ice-blue);
+  margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.memory-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.memory-tag {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.memory-tag.work {
+  background-color: rgba(61, 232, 160, 0.1);
+  color: var(--color-eve-green);
+  border: 1px solid var(--color-eve-green);
+}
+
+.memory-tag.person {
+  background-color: rgba(244, 162, 97, 0.1);
+  color: #F4A261;
+  border: 1px solid #F4A261;
+}
+
+.memory-tag.preference {
+  background-color: rgba(233, 110, 166, 0.1);
+  color: #E96EA6;
+  border: 1px solid #E96EA6;
+}
+
+.memory-date {
+  font-family: var(--font-display);
+  font-size: 9px;
+  color: var(--color-space-gray);
+}

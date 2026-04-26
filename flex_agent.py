@@ -642,11 +642,11 @@ async def execute_workflow(config: dict, plan: dict):
 
             print("[시스템] ℹ️ 사용자 요청에 따라 자동화 필드 외 기타 정보는 브라우저에서 직접 확인해 주세요.")
             print("\n[시스템] ✨ 자동 입력 후 브라우저에서 나머지 내용을 확인해 주세요.")
-            await ainput("\n[시스템] 내용을 확인하신 후, 브라우저를 닫으려면 엔터를 누르세요...")
+            await ainput("\n[시스템] 내용을 확인하신 후, 브라우저를 닫으려면 텍스트를 아무거나 입력하고 전송해 주세요...")
             
         except Exception as e:
             print(f"\n[시스템] ❌ 자동 수행 중 오류가 발생했습니다: {e}")
-            await ainput("\n[시스템] 오류가 발생했습니다. 확인 후 엔터를 누르면 브라우저를 닫습니다...")
+            await ainput("\n[시스템] 오류가 발생했습니다. 확인 후 텍스트를 아무거나 입력하고 전송하면 브라우저를 닫습니다...")
         finally:
             await browser.close()
 
@@ -998,7 +998,7 @@ async def flex_login_test(config):
             except:
                 print("\n[시스템] ⚠️ 로그인 성공했으나 메뉴 접근에 실패했습니다. (사이드바 확인 필요)")
 
-            await ainput("\n[시스템] 엔터를 누르면 브라우저를 닫습니다...")
+            await ainput("\n[시스템] 텍스트를 아무거나 입력하고 전송하면 브라우저를 닫습니다...")
         except Exception as e:
             print(f"\n[시스템] ❌ 오류: {e}")
         finally:

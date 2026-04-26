@@ -1,0 +1,55 @@
+:root {
+  --color-space-black: #0A0E1A;
+  --color-deep-navy: #080C18;
+  --color-arctic-blue: #4AB3F4;
+  --color-eve-green: #3DE8A0;
+  --color-ice-blue: #B8D4F0;
+  --color-dim-blue: #7AB3D4;
+  --color-space-gray: #2A4A7A;
+  
+  --color-dark-blue: #14213d; /* For bubbles */
+  --color-dark-green: #0a2618; /* For user bubbles */
+
+  --font-display: 'Orbitron', sans-serif;
+  --font-body: 'Exo 2', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--color-space-black);
+  color: var(--color-ice-blue);
+  font-family: var(--font-body);
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  font-size: 14px;
+}
+
+#root {
+  height: 100%;
+}
+
+button {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  outline: none;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-space-gray);
+  border-radius: 3px;
+}
